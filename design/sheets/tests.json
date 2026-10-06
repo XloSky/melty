@@ -71,6 +71,25 @@
         "web_swing"
       ],
       "result": "pass"
+    },
+    {
+      "id": "t_input_routes",
+      "scenario": "The two-swing run three times: action polling only (OnAction names unreadable, as Melty reports for CET 1.37.1), OnAction only (polling unavailable), and both at once",
+      "pass_if": "two swings start on every route; with both routes, each press is handled exactly once",
+      "abilities": [
+        "web_swing",
+        "momentum_carry"
+      ],
+      "result": "pass"
+    },
+    {
+      "id": "t_camera_basis",
+      "scenario": "The two-swing run with the camera's basis turned 90 degrees about Z (as Melty saw on some game versions), both directions",
+      "pass_if": "two swings start and travel >= 80 m forward along the player's heading in both cases",
+      "abilities": [
+        "web_swing"
+      ],
+      "result": "pass"
     }
   ]
 }

@@ -107,7 +107,13 @@ local playerObj = {
     GetWorldForward = function() local f = camBasis(); return V(f.x, f.y, 0) end,
     GetWorldOrientation = function() return { ToEulerAngles = function() return EulerAngles.new(0, 0, P.yaw) end } end,
     GetFPPCameraComponent = function() return {
-        GetLocalToWorld = function() local f, r, u = camBasis(); return {
+        GetLocalToWorld = function()
+            local f, r, u = camBasis()
+            if H.cameraTurn then -- reproduce the turned basis Melty reported: inverse of the fix
+                local function t(v) if H.cameraTurn == 1 then return V(-v.y, v.x, v.z) end return V(v.y, -v.x, v.z) end
+                f, r, u = t(f), t(r), t(u)
+            end
+            return {
             GetTranslation = function() return V(P.pos.x, P.pos.y, P.pos.z + 1.7) end,
             GetAxisY = function() return f end,
             GetAxisX = function() return r end,
@@ -141,6 +147,10 @@ Game = {
 }
 
 local scriptInterface = {
+    GetActionValue = function(_, name)
+        if H.noPolling then error("GetActionValue unavailable (route test)") end
+        return H.buttons[name] and 1.0 or 0.0
+    end,
     RaycastWithASingleGroup = function(_, from, to, group)
         assert(group == "PlayerBlocker")
         local p, n = H.raycast(from, to)
@@ -162,6 +172,10 @@ ImGui = {
 }
 
 local function fakeAction(name, kind)
+    if H.noActionNames then
+        -- what Melty reports for CET 1.37.1: the callback fires, the name can't be read
+        return { GetName = function() error("name unreadable") end, GetType = function() return { value = kind } end }
+    end
     return { GetName = function() return name end, GetType = function() return { value = kind } end }
 end
 
@@ -237,7 +251,19 @@ function H.run(start, script, duration, onFrame)
     -- exercise the settings window once (CET overlay open -> draw -> close)
     events.onOverlayOpen(); events.onDraw(); events.onOverlayClose()
     local onAction = observers["PlayerPuppet.OnAction"]
-    H.fire = function(name, kind) onAction({}, fakeAction(name, kind), {}) end
+    H.buttons = {}
+    H.fire = function(name, kind)
+        H.buttons[name] = (kind == "BUTTON_PRESSED")
+        onAction({}, fakeAction(name, kind), {})
+    end
+    -- count how many presses reach the mover, to catch double handling when both routes work
+    H.swingPresses = 0
+    local m0 = H.getMover()
+    local cls = getmetatable(m0).__index
+    rawset(m0, "onSwing", function(self, down)
+        if down then H.swingPresses = H.swingPresses + 1 end
+        return cls.onSwing(self, down)
+    end)
     local onLoco = observers["LocomotionEventsTransition.OnUpdate"]
     local dt, t, si = 1 / 60, 0, 1
     local mod = H.getMover()
@@ -247,7 +273,7 @@ function H.run(start, script, duration, onFrame)
             local s = script[si]
             if s.action then
                 if s.action == "Jump" and s.kind == "BUTTON_PRESSED" then P.jumpQueued = true end
-                onAction({}, fakeAction(s.action, s.kind), {})
+                H.fire(s.action, s.kind)
             end
             if s.run ~= nil then P.running = s.run end
             if s.look then P.yaw, P.pitch = s.look[1], s.look[2] end

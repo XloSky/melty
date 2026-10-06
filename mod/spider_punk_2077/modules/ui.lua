@@ -18,7 +18,7 @@ function ui.drawWeb(api, mover, sheets)
     api.drawLine(x1, y1, x2, y2, style.color_rgba, style.thickness)
 end
 
-function ui.drawSettings(settings, mover, sheets)
+function ui.drawSettings(settings, mover, sheets, inputRoute)
     if not ui.overlayOpen then return end
     if ImGui.Begin("Spider-Punk 2077") then
         local changed
@@ -38,7 +38,7 @@ function ui.drawSettings(settings, mover, sheets)
             if used then settings.values[id] = v; settings.save() end
         end
         if ImGui.Button("Reset to defaults") then settings.reset(); settings.save() end
-        ImGui.Text("State: " .. mover.mode)
+        ImGui.Text("State: " .. mover.mode .. "   |   Input: " .. tostring(inputRoute))
     end
     ImGui.End()
 end

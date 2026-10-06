@@ -1,23 +1,144 @@
 {
   "sheet": "inputs",
-  "about": "How each trigger is read. Game actions come from Observe(PlayerPuppet.OnAction) so they follow the player's own key/pad bindings with no setup; every manual trigger also has an optional CET registerInput binding as a fallback. One row = INPUTS.<id>.",
+  "about": "How each trigger is read. Main route: every frame the mod polls GetActionValue(<game action>) on the locomotion script interface, so inputs follow the player's own key/pad bindings with no setup. Backup: Observe(PlayerPuppet.OnAction). Last resort: optional CET registerInput bindings. A route is used per action only once it has produced a reading. One row = INPUTS.<id>.",
   "columns": {
-    "id": {"type": "id"},
-    "kind": {"type": "enum", "values": ["hold", "release", "press", "modifier", "automatic"]},
-    "game_actions": {"type": "list", "about": "ListenerAction names (any of)", "optional_empty": true},
-    "events": {"type": "list", "about": "gameinputActionType values reacted to", "optional_empty": true},
-    "modifier": {"type": "ref", "sheet": "inputs", "nullable": true},
-    "cet_input_id": {"type": "text", "nullable": true, "about": "registerInput id (player may bind it in the CET overlay; optional)"},
-    "default_keys": {"type": "text", "about": "What the player presses with default game bindings"},
-    "evidence": {"type": "text"},
-    "status": {"type": "enum", "values": ["source-verified", "pending-in-game", "in-game-verified"]}
+    "id": {
+      "type": "id"
+    },
+    "kind": {
+      "type": "enum",
+      "values": [
+        "hold",
+        "release",
+        "press",
+        "modifier",
+        "automatic"
+      ]
+    },
+    "game_actions": {
+      "type": "list",
+      "about": "ListenerAction names (any of)",
+      "optional_empty": true
+    },
+    "events": {
+      "type": "list",
+      "about": "gameinputActionType values reacted to",
+      "optional_empty": true
+    },
+    "modifier": {
+      "type": "ref",
+      "sheet": "inputs",
+      "nullable": true
+    },
+    "cet_input_id": {
+      "type": "text",
+      "nullable": true,
+      "about": "registerInput id (player may bind it in the CET overlay; optional)"
+    },
+    "default_keys": {
+      "type": "text",
+      "about": "What the player presses with default game bindings"
+    },
+    "evidence": {
+      "type": "text"
+    },
+    "status": {
+      "type": "enum",
+      "values": [
+        "source-verified",
+        "pending-in-game",
+        "in-game-verified"
+      ]
+    }
   },
   "rows": [
-    {"id": "swing_hold", "kind": "hold", "game_actions": ["Jump"], "events": ["BUTTON_PRESSED"], "modifier": null, "cet_input_id": "wonc_swing", "default_keys": "Hold Space / A (Xbox) / Cross (PS) while in the air", "evidence": "Action name 'Jump' and BUTTON_PRESSED/BUTTON_RELEASED: psiberx input sample gist 0e94bc93; registerInput: CET src/scripting/ScriptContext.cpp", "status": "source-verified"},
-    {"id": "swing_release", "kind": "release", "game_actions": ["Jump"], "events": ["BUTTON_RELEASED"], "modifier": null, "cet_input_id": "wonc_swing", "default_keys": "Let go of Space / A / Cross", "evidence": "psiberx input sample gist 0e94bc93", "status": "source-verified"},
-    {"id": "wings_toggle", "kind": "press", "game_actions": ["ToggleCrouch", "Crouch"], "events": ["BUTTON_PRESSED"], "modifier": null, "cet_input_id": "wonc_wings", "default_keys": "Press C / B (Xbox) / Circle (PS) while in the air", "evidence": "Action names from the game's input config; not yet seen in this mod's action log", "status": "pending-in-game"},
-    {"id": "aim_state", "kind": "modifier", "game_actions": ["CameraAim"], "events": ["BUTTON_PRESSED", "BUTTON_RELEASED"], "modifier": null, "cet_input_id": null, "default_keys": "Hold right mouse / LT / L2", "evidence": "Action name from the game's input config; not yet seen in this mod's action log", "status": "pending-in-game"},
-    {"id": "zip_press", "kind": "press", "game_actions": ["Jump"], "events": ["BUTTON_PRESSED"], "modifier": "aim_state", "cet_input_id": "wonc_zip", "default_keys": "Aim, then press Space / A / Cross", "evidence": "Jump verified (gist 0e94bc93); modifier depends on aim_state", "status": "pending-in-game"},
-    {"id": "auto_ground", "kind": "automatic", "game_actions": [], "events": [], "modifier": null, "cet_input_id": null, "default_keys": "Nothing: happens by itself", "evidence": "Triggered by the ground raycast each frame", "status": "source-verified"}
+    {
+      "id": "swing_hold",
+      "kind": "hold",
+      "game_actions": [
+        "Jump"
+      ],
+      "events": [
+        "BUTTON_PRESSED"
+      ],
+      "modifier": null,
+      "cet_input_id": "spiderpunk_swing",
+      "default_keys": "Hold Space / A (Xbox) / Cross (PS) while in the air",
+      "evidence": "Read by polling GetActionValue on the locomotion script interface (main route), with PlayerPuppet.OnAction as backup. Action names: 'Jump' from psiberx gist 0e94bc93 and Vault Anywhere; release = value back to 0",
+      "status": "pending-in-game"
+    },
+    {
+      "id": "swing_release",
+      "kind": "release",
+      "game_actions": [
+        "Jump"
+      ],
+      "events": [
+        "BUTTON_RELEASED"
+      ],
+      "modifier": null,
+      "cet_input_id": "spiderpunk_swing",
+      "default_keys": "Let go of Space / A / Cross",
+      "evidence": "Read by polling GetActionValue on the locomotion script interface (main route), with PlayerPuppet.OnAction as backup. Action names: 'Jump' from psiberx gist 0e94bc93 and Vault Anywhere; release = value back to 0",
+      "status": "pending-in-game"
+    },
+    {
+      "id": "wings_toggle",
+      "kind": "press",
+      "game_actions": [
+        "ToggleCrouch",
+        "Crouch"
+      ],
+      "events": [
+        "BUTTON_PRESSED"
+      ],
+      "modifier": null,
+      "cet_input_id": "spiderpunk_wings",
+      "default_keys": "Press C / B (Xbox) / Circle (PS) while in the air",
+      "evidence": "Read by polling GetActionValue on the locomotion script interface (main route), with PlayerPuppet.OnAction as backup. Action names: 'Jump' from psiberx gist 0e94bc93 and Vault Anywhere; 'ToggleCrouch'/'Crouch' and 'CameraAim' from the game's input config",
+      "status": "pending-in-game"
+    },
+    {
+      "id": "aim_state",
+      "kind": "modifier",
+      "game_actions": [
+        "CameraAim"
+      ],
+      "events": [
+        "BUTTON_PRESSED",
+        "BUTTON_RELEASED"
+      ],
+      "modifier": null,
+      "cet_input_id": null,
+      "default_keys": "Hold right mouse / LT / L2",
+      "evidence": "Read by polling GetActionValue on the locomotion script interface (main route), with PlayerPuppet.OnAction as backup. Action names: 'Jump' from psiberx gist 0e94bc93 and Vault Anywhere; 'ToggleCrouch'/'Crouch' and 'CameraAim' from the game's input config",
+      "status": "pending-in-game"
+    },
+    {
+      "id": "zip_press",
+      "kind": "press",
+      "game_actions": [
+        "Jump"
+      ],
+      "events": [
+        "BUTTON_PRESSED"
+      ],
+      "modifier": "aim_state",
+      "cet_input_id": "spiderpunk_zip",
+      "default_keys": "Aim, then press Space / A / Cross",
+      "evidence": "Read by polling GetActionValue on the locomotion script interface (main route), with PlayerPuppet.OnAction as backup. Action names: 'Jump' from psiberx gist 0e94bc93 and Vault Anywhere; 'ToggleCrouch'/'Crouch' and 'CameraAim' from the game's input config",
+      "status": "pending-in-game"
+    },
+    {
+      "id": "auto_ground",
+      "kind": "automatic",
+      "game_actions": [],
+      "events": [],
+      "modifier": null,
+      "cet_input_id": null,
+      "default_keys": "Nothing: happens by itself",
+      "evidence": "Triggered by the ground raycast each frame",
+      "status": "source-verified"
+    }
   ]
 }

@@ -74,6 +74,7 @@
         "max_speed"
       ],
       "hooks": [
+        "action_poll",
         "on_action",
         "locomotion_interface",
         "raycast",
@@ -131,6 +132,7 @@
         "gravity"
       ],
       "hooks": [
+        "action_poll",
         "on_action",
         "raycast",
         "teleport",
@@ -155,6 +157,7 @@
         "zip_pop"
       ],
       "hooks": [
+        "action_poll",
         "on_action",
         "raycast",
         "teleport",

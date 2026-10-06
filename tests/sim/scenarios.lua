@@ -114,4 +114,33 @@ function S.t_jump_not_stolen()
     return ok, string.format("swingFrames=%d events=%s", s.modes.swing or 0, table.concat(s.events, ","))
 end
 
+function S.t_input_routes()
+    local results = {}
+    local ok = true
+    for _, route in ipairs({ "poll-only", "events-only", "both" }) do
+        H.noActionNames = (route == "poll-only")
+        H.noPolling = (route == "events-only")
+        local s, swings = twoSwings(10)
+        local fine = swings >= 2 and H.swingPresses == 2
+        ok = ok and fine
+        results[#results + 1] = string.format("%s: swings=%d presses=%d", route, swings, H.swingPresses)
+    end
+    H.noActionNames, H.noPolling = false, false
+    return ok, table.concat(results, "; ")
+end
+
+function S.t_camera_basis()
+    local out, ok = {}, true
+    for _, turn in ipairs({ 1, -1 }) do
+        H.cameraTurn = turn
+        local s, swings = twoSwings(10)
+        local forward = s.final.y - (-8) -- the start faces +Y
+        local fine = swings >= 2 and forward >= 80
+        ok = ok and fine
+        out[#out + 1] = string.format("turn %d: swings=%d forward=%.1fm", turn, swings, forward)
+    end
+    H.cameraTurn = nil
+    return ok, table.concat(out, "; ")
+end
+
 return S
