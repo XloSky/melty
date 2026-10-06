@@ -37,3 +37,7 @@ Marvel's Spider-Man 2 is the inspiration, not a requirement. No files from eithe
 - Built with AI (Claude Code), using the [universal-modder](https://github.com/rehan-remade/universal-modder) toolkit's method.
 - API usage was checked against the sources of [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks), [psiberx's input sample](https://gist.github.com/psiberx/0e94bc93ed40a70a93a410734a5f5ade) and [entSpawner](https://github.com/justarandomguyintheinternet/CP77_entSpawner). No code from them is included.
 - Inspired by Insomniac Games' Marvel's Spider-Man 2. This is not affiliated with or endorsed by Marvel, Sony, Insomniac or CD PROJEKT RED.
+
+## License
+
+MIT (see LICENSE). Remixes are welcome on Melty.

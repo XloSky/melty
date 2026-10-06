@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "mode": "installed",
+  "games": [{ "slug": "cyberpunk-2077", "role": "primary" }],
+  "components": [{ "id": "main", "fileName": "spider_punk_2077-*.zip", "label": "Main files", "kind": "main", "required": true }],
+  "requirements": [{ "kind": "loader", "id": "cet" }],
+  "mappings": [{ "component": "main", "from": "bin/x64/plugins/cyber_engine_tweaks/mods/spider_punk_2077/", "to": "{game}/bin/x64/plugins/cyber_engine_tweaks/mods/spider_punk_2077" }],
+  "launch": { "kind": "game" }
+}
