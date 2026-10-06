@@ -1,0 +1,191 @@
+{
+  "sheet": "abilities",
+  "about": "Every move the player gets. One row = one ability = one generated Lua struct in generated/sheets.lua (ABILITIES.<id>).",
+  "columns": {
+    "id": {
+      "type": "id"
+    },
+    "name": {
+      "type": "text",
+      "about": "Player-facing name (overlay + README)"
+    },
+    "sm2_reference": {
+      "type": "text",
+      "about": "What it recreates from Marvel's Spider-Man 2"
+    },
+    "trigger": {
+      "type": "ref",
+      "sheet": "inputs"
+    },
+    "requires": {
+      "type": "text",
+      "about": "State the player must be in"
+    },
+    "mechanic": {
+      "type": "text",
+      "about": "What the code does each frame"
+    },
+    "ends_when": {
+      "type": "text"
+    },
+    "tuning": {
+      "type": "ref_list",
+      "sheet": "tuning"
+    },
+    "hooks": {
+      "type": "ref_list",
+      "sheet": "hooks"
+    },
+    "visuals": {
+      "type": "ref_list",
+      "sheet": "visuals",
+      "optional_empty": true
+    },
+    "sim_test": {
+      "type": "ref",
+      "sheet": "tests"
+    },
+    "in_game": {
+      "type": "status",
+      "about": "pending until seen working in the real game"
+    }
+  },
+  "rows": [
+    {
+      "id": "web_swing",
+      "name": "Web Swing",
+      "sm2_reference": "Hold-to-swing with automatic anchor choice: no aiming, the web finds a building edge above and ahead",
+      "trigger": "swing_hold",
+      "requires": "airborne (feet more than ground_probe above ground) and not in a vehicle, menu or scene",
+      "mechanic": "Raycast a fan of directions up and ahead of the camera; attach to the best hit; shorten the web (fast reel) so the arc's bottom keeps swing_floor_clearance above the ground below; integrate gravity + steering; keep the player on a sphere of rope_length around the anchor (pendulum); reel in slowly; teleport the player each frame",
+      "ends_when": "swing button released (-> momentum_carry), rope hits min length, or ground reached (-> soft_landing)",
+      "tuning": [
+        "swing_arm_delay",
+        "anchor_max_range",
+        "anchor_pitch_min",
+        "anchor_pitch_max",
+        "anchor_yaw_spread",
+        "rope_min_length",
+        "rope_reel_speed",
+        "swing_floor_clearance",
+        "rope_fast_reel",
+        "gravity",
+        "swing_steer_accel",
+        "max_speed"
+      ],
+      "hooks": [
+        "on_action",
+        "locomotion_interface",
+        "raycast",
+        "teleport",
+        "player_position",
+        "player_orientation",
+        "camera_transform",
+        "game_paused",
+        "mounted_vehicle",
+        "on_update"
+      ],
+      "visuals": [
+        "web_line"
+      ],
+      "sim_test": "t_swing_from_roof",
+      "in_game": "pending"
+    },
+    {
+      "id": "momentum_carry",
+      "name": "Momentum Release",
+      "sm2_reference": "Letting go keeps your speed, with an upward fling when released on the up-swing",
+      "trigger": "swing_release",
+      "requires": "was swinging",
+      "mechanic": "Keep the swing velocity, add release_boost along it if moving upward, then fly ballistically (gravity + air_drag) with collision sweeps until ground or the next swing",
+      "ends_when": "ground near (-> soft_landing), next swing, zip or wings",
+      "tuning": [
+        "release_boost",
+        "gravity",
+        "air_drag",
+        "max_speed",
+        "wall_slide_keep"
+      ],
+      "hooks": [
+        "raycast",
+        "teleport",
+        "player_orientation",
+        "on_update"
+      ],
+      "visuals": [],
+      "sim_test": "t_swing_from_roof",
+      "in_game": "pending"
+    },
+    {
+      "id": "web_wings",
+      "name": "Web Wings",
+      "sm2_reference": "Web wings glide: a fast, shallow glide steered by where you look",
+      "trigger": "wings_toggle",
+      "requires": "airborne and not swinging",
+      "mechanic": "Horizontal velocity eases toward camera heading at glide_speed; sink rate clamped to glide_sink; collision sweeps as in momentum_carry",
+      "ends_when": "toggle pressed again, swing, zip, or ground near (-> soft_landing)",
+      "tuning": [
+        "glide_speed",
+        "glide_sink",
+        "glide_turn_rate",
+        "gravity"
+      ],
+      "hooks": [
+        "on_action",
+        "raycast",
+        "teleport",
+        "camera_transform",
+        "on_update"
+      ],
+      "visuals": [],
+      "sim_test": "t_glide",
+      "in_game": "pending"
+    },
+    {
+      "id": "web_zip",
+      "name": "Web Zip",
+      "sm2_reference": "Point launch: zip to the spot under your crosshair and pop up off it",
+      "trigger": "zip_press",
+      "requires": "aiming (aim held) and a surface under the crosshair within zip_range",
+      "mechanic": "Raycast from camera along view; fly in a straight line at zip_speed to the hit point pulled back along the surface normal; on arrival add zip_pop upward and continue as momentum_carry",
+      "ends_when": "arrival or blocked path (-> momentum_carry)",
+      "tuning": [
+        "zip_range",
+        "zip_speed",
+        "zip_pop"
+      ],
+      "hooks": [
+        "on_action",
+        "raycast",
+        "teleport",
+        "camera_transform",
+        "on_update"
+      ],
+      "visuals": [
+        "web_line"
+      ],
+      "sim_test": "t_zip",
+      "in_game": "pending"
+    },
+    {
+      "id": "soft_landing",
+      "name": "Soft Landing",
+      "sm2_reference": "Spider-Man never takes fall damage from traversal",
+      "trigger": "auto_ground",
+      "requires": "mod is driving the player and ground is within ground_probe below",
+      "mechanic": "Place the player ground_clearance above the hit and stop driving, so the game's own fall is a few centimetres (no fall damage)",
+      "ends_when": "immediately (hands control back to the game)",
+      "tuning": [
+        "ground_probe",
+        "ground_clearance"
+      ],
+      "hooks": [
+        "raycast",
+        "teleport"
+      ],
+      "visuals": [],
+      "sim_test": "t_landing",
+      "in_game": "pending"
+    }
+  ]
+}

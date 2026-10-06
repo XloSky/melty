@@ -1,0 +1,34 @@
+{
+  "sheet": "hooks",
+  "about": "Every place the mod touches the game or Cyber Engine Tweaks. One row = HOOKS.<id> (call text + status), and the adapter in game_api.lua implements exactly these rows. Anything not source-verified is wrapped in pcall with the listed fallback.",
+  "columns": {
+    "id": {"type": "id"},
+    "kind": {"type": "enum", "values": ["cet-event", "cet-global", "game-observe", "game-call", "imgui"]},
+    "call": {"type": "text", "about": "Exact Lua used"},
+    "returns": {"type": "text"},
+    "evidence": {"type": "text", "about": "Where the exact call was seen working"},
+    "status": {"type": "enum", "values": ["source-verified", "pending-in-game", "in-game-verified"]},
+    "fallback": {"type": "text", "about": "What happens if the call errors"}
+  },
+  "rows": [
+    {"id": "on_init", "kind": "cet-event", "call": "registerForEvent('onInit', fn)", "returns": "nil", "evidence": "CET src/scripting/ScriptContext.cpp:52", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "on_update", "kind": "cet-event", "call": "registerForEvent('onUpdate', fn(deltaTime))", "returns": "nil", "evidence": "CET src/scripting/ScriptContext.cpp:56,260", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "on_draw", "kind": "cet-event", "call": "registerForEvent('onDraw', fn)", "returns": "nil", "evidence": "CET src/scripting/ScriptContext.cpp:58", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "overlay_events", "kind": "cet-event", "call": "registerForEvent('onOverlayOpen'|'onOverlayClose', fn)", "returns": "nil", "evidence": "CET src/scripting/ScriptContext.cpp:60,62", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "register_input", "kind": "cet-global", "call": "registerInput(id, label, fn(isDown))", "returns": "nil", "evidence": "CET src/scripting/ScriptContext.cpp:159", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "on_action", "kind": "game-observe", "call": "Observe('PlayerPuppet', 'OnAction', fn(...)) with Game.NameToString(action:GetName(action)) and action:GetType(action).value", "returns": "action name string, gameinputActionType string", "evidence": "psiberx input sample gist 0e94bc93 (callback args differ between CET versions, so the adapter takes the first arg that has GetName)", "status": "source-verified", "fallback": "CET registerInput bindings still work"},
+    {"id": "locomotion_interface", "kind": "game-observe", "call": "Observe('LocomotionEventsTransition', 'OnUpdate', fn(_, _, _, scriptInterface))", "returns": "StateGameScriptInterface kept for raycasts", "evidence": "CP77_entSpawner modules/utils/editor/editor.lua:216", "status": "source-verified", "fallback": "spatial query raycast (raycast_alt)"},
+    {"id": "raycast", "kind": "game-call", "call": "scriptInterface:RaycastWithASingleGroup(fromV4, toV4, 'PlayerBlocker') -> r; r:IsValid(); r.position; r.normal", "returns": "TraceResult (Vector3 position/normal)", "evidence": "CP77_entSpawner modules/utils/editor/editor.lua:310-318", "status": "source-verified", "fallback": "raycast_alt, then 'no hit' (swing/zip simply do not start)"},
+    {"id": "raycast_alt", "kind": "game-call", "call": "Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(fromV4, toV4, 'Static', false, false) -> ok, r", "returns": "bool, TraceResult", "evidence": "Common community pattern; not seen in the sources cloned here", "status": "pending-in-game", "fallback": "'no hit'"},
+    {"id": "teleport", "kind": "game-call", "call": "Game.GetTeleportationFacility():Teleport(player, Vector4.new(x,y,z,1), eulerAngles)", "returns": "nil", "evidence": "CP77_entSpawner modules/ui/savedUI.lua:192, classes/editor/positionable.lua:401", "status": "source-verified", "fallback": "mod stops driving the player"},
+    {"id": "player_position", "kind": "game-call", "call": "Game.GetPlayer():GetWorldPosition()", "returns": "Vector4 (feet)", "evidence": "CP77_entSpawner modules/utils/editor/camera.lua:29", "status": "source-verified", "fallback": "skip frame"},
+    {"id": "player_orientation", "kind": "game-call", "call": "Game.GetPlayer():GetWorldOrientation():ToEulerAngles()", "returns": "EulerAngles", "evidence": "CP77_entSpawner classes/editor/positionable.lua:401", "status": "source-verified", "fallback": "EulerAngles.new(0,0,0)"},
+    {"id": "camera_transform", "kind": "game-call", "call": "Game.GetPlayer():GetFPPCameraComponent():GetLocalToWorld() -> m; m:GetTranslation(); m:GetAxisY(); m:GetAxisX(); m:GetAxisZ()", "returns": "Matrix (position + basis)", "evidence": "CP77_entSpawner modules/ui/spawnUI.lua:641-644 (GetAxisY, GetTranslation)", "status": "source-verified", "fallback": "player forward + position"},
+    {"id": "project_point", "kind": "game-call", "call": "Game.GetCameraSystem():ProjectPoint(Vector4) -> ndc; px=(ndc.x+1)*w/2, py=(1-ndc.y)*h/2", "returns": "Vector4 in normalised device coords", "evidence": "CP77_entSpawner modules/utils/editor/camera.lua:179, classes/spawn/spawnable.lua:465-469", "status": "source-verified", "fallback": "web line not drawn"},
+    {"id": "display_resolution", "kind": "cet-global", "call": "GetDisplayResolution() -> w, h", "returns": "numbers", "evidence": "CET src/scripting/Scripting.cpp:133", "status": "source-verified", "fallback": "n/a (CET contract)"},
+    {"id": "draw_line", "kind": "imgui", "call": "ImGui.ImDrawListAddLine(ImGui.GetBackgroundDrawList(), x1, y1, x2, y2, colorABGR, thickness)", "returns": "nil", "evidence": "CET src/sol_imgui/sol_imgui.h:3867,3936", "status": "source-verified", "fallback": "web line not drawn"},
+    {"id": "game_paused", "kind": "game-call", "call": "GetSingleton('inkMenuScenario'):GetSystemRequestsHandler():IsGamePaused()", "returns": "bool", "evidence": "Handler object verified (cp2077-cet-kit GameSettings.lua:105 uses :IsPreGame() on it); IsGamePaused itself not seen in cloned sources", "status": "pending-in-game", "fallback": "IsPreGame() on the same handler; else assume not paused"},
+    {"id": "mounted_vehicle", "kind": "game-call", "call": "Game.GetMountedVehicle(player)", "returns": "VehicleObject or nil", "evidence": "Common community pattern; not seen in the sources cloned here", "status": "pending-in-game", "fallback": "assume on foot (vehicle controls do not send the Jump action anyway)"},
+    {"id": "settings_io", "kind": "cet-global", "call": "io.open('settings.json', mode) + json.encode/json.decode", "returns": "file / table", "evidence": "CET src/scripting/LuaSandbox.cpp:41 (json), 560-571 (sandboxed io.open in the mod folder)", "status": "source-verified", "fallback": "defaults from the tuning sheet"}
+  ]
+}

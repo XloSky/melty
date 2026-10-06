@@ -1,0 +1,76 @@
+{
+  "sheet": "tests",
+  "about": "The offline oracle: each row is one scripted scenario run by tests/run_sim.py against the real mod code with a mocked CET/game API and a box city. Passing here means the logic works, not that it works in the game.",
+  "columns": {
+    "id": {
+      "type": "id"
+    },
+    "scenario": {
+      "type": "text"
+    },
+    "pass_if": {
+      "type": "text"
+    },
+    "abilities": {
+      "type": "ref_list",
+      "sheet": "abilities"
+    },
+    "result": {
+      "type": "enum",
+      "values": [
+        "not-run",
+        "pass",
+        "fail"
+      ]
+    }
+  },
+  "rows": [
+    {
+      "id": "t_swing_from_roof",
+      "scenario": "Start on a 40 m roof facing an avenue of 70-110 m towers, run off, hold Jump, let go on the up-swing (vertical speed > 2 m/s), hold again for a second swing, let go on its up-swing",
+      "pass_if": "two swings start; lowest point while swinging >= swing_floor_clearance - 1 above the street; travelled >= 80 m; peak speed >= 18 m/s; no driven frame faster than max_speed + 1; never inside a building",
+      "abilities": [
+        "web_swing",
+        "momentum_carry"
+      ],
+      "result": "pass"
+    },
+    {
+      "id": "t_glide",
+      "scenario": "Run off a 40 m roof, tap Jump, then press Crouch in the air (ToggleCrouch and Crouch both arrive)",
+      "pass_if": "sink rate never above glide_sink + 0.5; horizontal speed reaches 90% of glide_speed",
+      "abilities": [
+        "web_wings"
+      ],
+      "result": "pass"
+    },
+    {
+      "id": "t_zip",
+      "scenario": "Stand in the street, aim 10 degrees up at a wall 50 m away, press Jump while aiming",
+      "pass_if": "body passes within 3 m of the aimed point; never inside a building; no fall damage",
+      "abilities": [
+        "web_zip"
+      ],
+      "result": "pass"
+    },
+    {
+      "id": "t_landing",
+      "scenario": "The two-swing run from t_swing_from_roof, then fall to the street",
+      "pass_if": "hand-back happens with the feet <= ground_probe above ground and vertical speed handed to the game is 0",
+      "abilities": [
+        "soft_landing",
+        "momentum_carry"
+      ],
+      "result": "pass"
+    },
+    {
+      "id": "t_jump_not_stolen",
+      "scenario": "Tap Jump on the ground",
+      "pass_if": "no swing starts (normal jump left to the game)",
+      "abilities": [
+        "web_swing"
+      ],
+      "result": "pass"
+    }
+  ]
+}

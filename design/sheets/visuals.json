@@ -1,0 +1,17 @@
+{
+  "sheet": "visuals",
+  "about": "Everything drawn. v1 draws with CET's ImGui overlay only (no game assets shipped). One row = VISUALS.<id>.",
+  "columns": {
+    "id": {"type": "id"},
+    "kind": {"type": "enum", "values": ["overlay-line", "overlay-text"]},
+    "color_rgba": {"type": "list", "about": "0-255 r,g,b,a"},
+    "thickness": {"type": "number"},
+    "from": {"type": "text"},
+    "to": {"type": "text"},
+    "hooks": {"type": "ref_list", "sheet": "hooks"},
+    "about": {"type": "text"}
+  },
+  "rows": [
+    {"id": "web_line", "kind": "overlay-line", "color_rgba": [235, 245, 255, 230], "thickness": 2.5, "from": "camera position + right*0.25 - up*0.30 + forward*0.6 (V's wrist)", "to": "anchor point (swing) or zip target", "hooks": ["camera_transform", "project_point", "display_resolution", "draw_line", "on_draw"], "about": "The web strand, drawn only while it is in front of the camera"}
+  ]
+}
