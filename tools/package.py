@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build dist/web_of_night_city-<version>.zip laid out from the Cyberpunk 2077 game folder root.
+"""Build dist/spider_punk_2077-<version>.zip laid out from the Cyberpunk 2077 game folder root.
 
 Runs preflight, codegen and the simulator first; refuses to package if any of them fail.
 """
@@ -11,8 +11,8 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MOD = ROOT / "mod" / "web_of_night_city"
-DEST = "bin/x64/plugins/cyber_engine_tweaks/mods/web_of_night_city"
+MOD = ROOT / "mod" / "spider_punk_2077"
+DEST = "bin/x64/plugins/cyber_engine_tweaks/mods/spider_punk_2077"
 
 
 def run(*args):
@@ -26,7 +26,7 @@ def main():
     run("tools/gen.py")
     run("tests/run_sim.py", "--no-write")
     version = re.search(r'version = "([^"]+)"', (MOD / "init.lua").read_text()).group(1)
-    out = ROOT / "dist" / f"web_of_night_city-{version}.zip"
+    out = ROOT / "dist" / f"spider_punk_2077-{version}.zip"
     out.parent.mkdir(exist_ok=True)
     files = sorted(p for p in MOD.rglob("*") if p.is_file() and p.suffix == ".lua")
     files.append(ROOT / "README.md")

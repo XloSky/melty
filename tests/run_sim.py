@@ -12,7 +12,7 @@ from pathlib import Path
 from lupa import luajit21
 
 ROOT = Path(__file__).resolve().parent.parent
-MOD = ROOT / "mod" / "web_of_night_city"
+MOD = ROOT / "mod" / "spider_punk_2077"
 SHEET = ROOT / "design" / "sheets" / "tests.json"
 
 

@@ -1,4 +1,4 @@
--- Offline oracle for Web of Night City.
+-- Offline oracle for Spider-Punk 2077.
 -- Mocks the exact CET / game calls listed in design/sheets/hooks.json, runs the real mod files
 -- (init.lua and modules/*), and drives scripted scenarios through a box city.
 -- Passing here means the mod's logic works; it says nothing about the real game until tested there.

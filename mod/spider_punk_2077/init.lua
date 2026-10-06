@@ -1,4 +1,4 @@
--- Web of Night City: Spider-Man 2 style web-swinging for Cyberpunk 2077 (Cyber Engine Tweaks mod).
+-- Spider-Punk 2077: Spider-Man 2 style web-swinging for Cyberpunk 2077 (Cyber Engine Tweaks mod).
 -- Behaviour, numbers and game hooks are defined in design/sheets/*.json and generated into generated/sheets.lua.
 local sheets = require("generated/sheets")
 local api = require("modules/game_api")
@@ -6,7 +6,7 @@ local mover = require("modules/mover")
 local settings = require("modules/settings")
 local ui = require("modules/ui")
 
-local WebOfNightCity = { version = "0.1.0" }
+local SpiderPunk2077 = { version = "0.1.0" }
 local m
 
 -- Route a game action or CET binding to the trigger rows in the inputs sheet.
@@ -16,7 +16,7 @@ local function actionMatches(row, name)
 end
 
 local function onGameAction(name, kind)
-    if settings.logActions then print("[WebOfNightCity] action", name, kind) end
+    if settings.logActions then print("[SpiderPunk2077] action", name, kind) end
     local I = sheets.inputs
     if actionMatches(I.aim_state, name) then
         if kind == "BUTTON_PRESSED" then m:onAim(true) elseif kind == "BUTTON_RELEASED" then m:onAim(false) end
@@ -33,10 +33,10 @@ registerForEvent("onInit", function()
     settings.init(sheets)
     m = mover.new(api, settings.T)
     m.enabled = settings.enabled
-    WebOfNightCity.mover = m -- reachable from other mods via GetMod("web_of_night_city")
+    SpiderPunk2077.mover = m -- reachable from other mods via GetMod("spider_punk_2077")
     api.observeLocomotion()
     api.observeActions(onGameAction)
-    print("[WebOfNightCity] " .. WebOfNightCity.version .. " ready")
+    print("[SpiderPunk2077] " .. SpiderPunk2077.version .. " ready")
 end)
 
 registerInput(sheets.inputs.swing_hold.cet_input_id, "Web swing (hold)", function(down) if m then m:onSwing(down) end end)
@@ -56,4 +56,4 @@ end)
 registerForEvent("onOverlayOpen", function() ui.overlayOpen = true end)
 registerForEvent("onOverlayClose", function() ui.overlayOpen = false end)
 
-return WebOfNightCity
+return SpiderPunk2077

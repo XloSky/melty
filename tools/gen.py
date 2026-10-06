@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate mod/web_of_night_city/generated/sheets.lua from design/sheets/*.json.
+"""Generate mod/spider_punk_2077/generated/sheets.lua from design/sheets/*.json.
 
 Each sheet row becomes one Lua table (the mod's equivalent of a struct), keyed by the row id.
 Refuses to generate while preflight has blocking findings.
@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "mod" / "web_of_night_city" / "generated" / "sheets.lua"
+OUT = ROOT / "mod" / "spider_punk_2077" / "generated" / "sheets.lua"
 SHEET_TABLES = ["abilities", "tuning", "inputs", "hooks", "visuals"]
 
 

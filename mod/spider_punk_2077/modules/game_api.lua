@@ -8,7 +8,7 @@ local api = { scriptInterface = nil, warned = {} }
 local function warnOnce(key, msg)
     if not api.warned[key] then
         api.warned[key] = true
-        print("[WebOfNightCity] " .. msg)
+        print("[SpiderPunk2077] " .. msg)
     end
 end
 

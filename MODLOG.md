@@ -1,4 +1,4 @@
-# MODLOG: Web of Night City
+# MODLOG: Spider-Punk 2077
 
 ## Intake (2026-10-06)
 - Mashup: Marvel's Spider-Man 2 traversal brought into Cyberpunk 2077. The user picked "web-swinging Night City" (swing, web wings, zip).

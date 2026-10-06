@@ -20,7 +20,7 @@ end
 
 function ui.drawSettings(settings, mover, sheets)
     if not ui.overlayOpen then return end
-    if ImGui.Begin("Web of Night City") then
+    if ImGui.Begin("Spider-Punk 2077") then
         local changed
         settings.enabled, changed = ImGui.Checkbox("Web-swinging on", settings.enabled)
         if changed then mover.enabled = settings.enabled; settings.save() end
